@@ -1,1 +1,1 @@
-# SALT2
+# SNANA_SALT2
