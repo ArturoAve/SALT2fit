@@ -14,6 +14,6 @@
 scratch_1.py
 scratch_2.py
 
-bash_CopyReplacingLCsOfMissingSNe_v1_0.sh
-bash_Odyssey_MultipleOperations_v1_1.sh
-bash_SNANALCfiles_MultipleOperations_v1_1.sh
+02_bash_CopyReplacingLCsOfMissingSNe.sh
+04_bash_SNANALCfiles_MultipleOperations.sh
+06_bash_Odyssey_MultipleOperations.sh
