@@ -1,7 +1,11 @@
+#------ python -------------
+
+*.ipynb
 *.html
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
-.gitattributes
+
+#------- r -----------
 
 .Rproj.user
 .Rapp.history
@@ -9,11 +13,12 @@
 .Rhistory
 *.Rproj
 
+#------- bash ------------
+
+*.sh
+
+#------- diverse ------------
+
+.gitattributes
 .DS_Store
-
-scratch_1.py
-scratch_2.py
-
-02_bash_CopyReplacingLCsOfMissingSNe.sh
-04_bash_SNANALCfiles_MultipleOperations.sh
-06_bash_Odyssey_MultipleOperations.sh
+*.log
