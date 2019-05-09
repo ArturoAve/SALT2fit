@@ -1,9 +1,20 @@
 #------ python -------------
 
-*.ipynb
+# *.ipynb
 *.html
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
+
+01_FindSNeNamesInSNANAbasedOnAndySample.ipynb
+# 03_WstdAndy_to_SNANA.ipynb
+05_Update_zcmb_in_SNANA_datafiles.ipynb
+07_CheckCovarianceMatrices.ipynb
+07_Plot_SNANA_LC_data_only.ipynb
+07_Plot_SNANA_SALT2_fitted_LCs.ipynb
+08_Create_fitres_FileFromSelectedSNe.ipynb
+09_SALT2_DistanceMu_InspectResults.ipynb
+10_SALT2_DistanceMu.ipynb
+Compare_SNANA__v10_35g_VS_v10_58g.ipynb
 
 #------- r -----------
 
