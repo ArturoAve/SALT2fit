@@ -6,11 +6,25 @@
 # ## Notes
 # - The output files will be saved in a subfolder called 'snana'
 
-# User
+import numpy as np
+import glob # To read the files in my directory
+import os # To use command line like instructions
+import datetime # Get the current date and time
 
-# Directory where Andy's wstd file to be converted is located:
+#--------------------------------------------------------60
+code_created_by = 'Arturo_Avelino'
+# On date: 2017.01.10 (yyyy.mm.dd)
+code_name = '03_WstdAndy_to_SNANA.ipynb'
+version_code = '0.1.6'
+last_update = '2019.05.09'
 
-dirwstd = '/Users/arturo/Dropbox/Research/SoftwareResearch/SNANA/Odyssey/home_snana/lowz/2_AndySampleOnly/LOWZ_FromAndyFriedman/Andy2SNANA_format/wstd_originals/'
+##############################################################################80
+
+# # User
+
+# Directory where Andy's wstd files to be converted are located:
+
+dirwstd = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd/Others/selected/'
 
 DirSaveOutput = dirwstd+'snana/'
 
@@ -22,16 +36,16 @@ DirSaveOutput = dirwstd+'snana/'
 #      'CSP' for low-z CSP LCs.
 Survey = 'LOWZ'
 
-#-------------------
+#--------------------------------------------------------60
 # Filter's name matching between Andy and SNANA
 
 # Write -all- the filter's name in the line "FILTERS: " in the
 # SNANA-format LC file? If False, then it will be written the
 # filters listed in the list 'filterListToConvert' below. If
-# true, then it will write down -all- the filters names, for those
+# true, then it will write down -all- the filters names. For those
 # that are not in the list 'filterListToConvert' then it will
 # write the filter's name using Andy's names.
-write_all_filters = False
+write_all_filters = True
 
 # List of filter names that will be converted their names from Andy's
 # to SNANA convention's names.
@@ -65,30 +79,27 @@ FilterNameConversion_dict['V'] = ['V']
 FilterNameConversion_dict['R'] = ['R']
 FilterNameConversion_dict['I'] = ['I']
 
-#--------------------------------------------------
+#--------------------------------------------------------60
 # Rename the output files using the first 'TrimFileName' characters
 # of the datafile.
+
 # "-4" = use the full name of the file except the extension characters ".dat"
 TrimFileName = -4
 # TrimFileName = 18
 
 # Print on the output files the date-time and script used to
 # create them?
-print_date_scriptName = False
-
-NotebookName = '03_WstdAndy_to_SNANA.ipynb'
+print_date_scriptName = True
 
 cc = 299792.458  # Speed of light (km/s)
 
+##############################################################################80
+
 # # Automatic
 
-import numpy as np
 #- Force the creation of the directory to save the outputs.
 #- "If the subdirectory does not exist then create it"
-import os # To use command line like instructions
 if not os.path.exists(DirSaveOutput): os.makedirs(DirSaveOutput)
-
-5+6
 
 # #### Function to identify string or number
 
@@ -107,120 +118,13 @@ print is_number('5'), is_number('e')
 # True False
 
 # Get the current date and time
-import datetime
-
 # Read the time and date now
 now = datetime.datetime.now()
 
-# #### Get the name of this ipython notebook
-# To print it in the output text files as reference.
-
-get_ipython().run_cell_magic('javascript', '', 'var kernel = IPython.notebook.kernel;\nvar thename = window.document.getElementById("notebook_name").innerHTML;\nvar command = "NotebookName = " + "\'"+thename+".ipynb"+"\'";\nkernel.execute(command);')
-
-print '#', (NotebookName)
-
-# # WstdAndy_to_SNANA_v1_1.ipynb
-
 # ### Metadata
 
-# (z_helio, error_z_helio)
-# From WoodVasey & Andy Friedman metadata file.
-
-"""
-import numpy as np
-
-DirMetadata = '/Users/arturo/Dropbox/Research/SoftwareResearch/Snoopy/\
-AndyLCComp/MyNotesAbout/'
-
-InfoSN_zHelio = np.genfromtxt(DirMetadata+
-                'WoodVasey_Andy/WoodVasey_AndyFriedman_zCMB_2017_08_11_Converted_.txt',
-                usecols=(0,1,2), dtype=['S24', float, float])
-
-# Create a dictionary:
-InfoSN_zHelio_dict ={}
-
-for i in range(len(InfoSN_zHelio)):
-    snname_int1 = InfoSN_zHelio[i][0]
-    zHelio_int1 = InfoSN_zHelio[i][1]/cc
-    err_zHelio_int1 = InfoSN_zHelio[i][2]/cc
-
-    InfoSN_zHelio_dict[snname_int1] = [ zHelio_int1, err_zHelio_int1  ]
-
-InfoSN_zHelio_dict['sn2006D']
-# [0.0085258982732647672, 1.6678204759907602e-05]
-"""
-0
-
-# (z_helio, error_z_helio, z_CMB, error_z_CMB)
-# From WoodVasey & Andy Friedman metadata file for the SPECIAL CASES
-"""
-InfoSN_zCMB_Special = np.genfromtxt(DirMetadata+'WoodVasey_Andy/WoodVasey_AndyFriedman_zCMB_2017_08_11_SpecialCases_Converted_Ho70.txt',
-                            usecols=(0,1,2, 14, 15),
-                            dtype=['S10', float, float, float, float])
-
-# Create a dictionary:
-InfoSN_zCMB_Special_dict ={}
-
-for i in range(len(InfoSN_zCMB_Special)):
-    snname_int2 = InfoSN_zCMB_Special[i][0]
-    zHelio_int2 = InfoSN_zCMB_Special[i][1]/cc
-    err_zHelio_int2 = InfoSN_zCMB_Special[i][2]/cc
-    zCMB_int2 = InfoSN_zCMB_Special[i][3]/cc
-    err_zCMB_int2 = InfoSN_zCMB_Special[i][4]/cc
-
-    InfoSN_zCMB_Special_dict[snname_int2] = [ zHelio_int2, err_zHelio_int2,
-                                              zCMB_int2, err_zCMB_int2  ]
-
-InfoSN_zCMB_Special_dict['sn1999cl']
-# [0.0076085970114698484,
-# 1.0006922855944561e-05,
-# 0.0031922083910463153,
-# 2.0013845711889123e-05]
-"""
-0
-
-# Using Michael Foley flow-corrected z_CMB + Cepheid distances + special cases
-# compiled by Andy Friedman
-"""
-InfoSN_zCMB_MFoley = np.genfromtxt(DirMetadata+'zCMB_FlowCorrected_MichaelFoley_original.txt',
-                            usecols=(0, 1, 2, 5), dtype=['S18', float, float, float])
-
-# Create a final dictionary: (snname: zhelio, err_zhelio, zcmb, err_zcmb, RA, DEC)
-InfoSN_dict ={}
-
-for i in range(len(InfoSN_zCMB_MFoley)):
-    snname_int3     = InfoSN_zCMB_MFoley[i][0]
-    zHelio_int3     = InfoSN_zHelio_dict[snname_int3][0]
-    err_zHelio_int3 = InfoSN_zHelio_dict[snname_int3][1]
-    RA_int  = InfoSN_zCMB_MFoley[i][1]
-    DEC_int = InfoSN_zCMB_MFoley[i][2]
-
-
-    #---- Define z_CMB and err_z_CMB ------
-
-    if snname_int3 in list(InfoSN_zCMB_Special['f0']): # Special cases
-        zCMB_int3 = InfoSN_zCMB_Special_dict[snname_int3][2]
-        err_zCMB_int3 = InfoSN_zCMB_Special_dict[snname_int3][3]
-    else: # Michael Foley's zcmb values
-        zCMB_int3 = InfoSN_zCMB_MFoley[i][3]
-        err_zCMB_int3 = 150/cc
-
-    InfoSN_dict[snname_int3] = [ zHelio_int3, err_zHelio_int3,
-                                 zCMB_int3, err_zCMB_int3, RA_int, DEC_int ]
-
-InfoSN_dict['sn1998bu']
-# [0.0029920699339274241,
-# 1.3342563807926082e-05,
-# 0.0021141927350000001,
-# 0.0005003461427972281,
-# 161.69179,
-# 11.83531]
-"""
-0
-
-DirMetadata = '/Users/arturo/Dropbox/Research/SoftwareResearch/Snoopy/AndyLCComp_2018_02/'
-
 MetadataFile = 'carrick_Flow_corrections_snnames_v1.txt'
+DirMetadata = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd/'
 
 # Reading the metadata file
 infoSNe_data = np.genfromtxt(DirMetadata+MetadataFile,
@@ -250,23 +154,18 @@ InfoSN_dict['sn1998bu']
 #  161.69166999999999,
 #  11.835279999999999]
 
-# #### DistanceMu_All_BeforeCutoffs.txt
-# #### (for the J-band Gaussian-process Hubble diagram)
-#
-# Reading the 'DistanceMu_All_BeforeCutoffs.txt' from GP Hubble diagram for J band: it contains *almost* all the SNe that I need. I use the information in this file to retrieve (t_Bmax, EBV_MW)
+#-----------------------------------------------------------------------------80
 
-DirJband = '/Users/arturo/Dropbox/Research/Articulos/10_AndyKaisey/10Compute/TheTemplates/J_band/Std_filters/4_HubbleDiagram_FlatPrior/AllSamples/Templ_AllSamples_z_gr_0/Phase-8_30_resid20_chi_1e6_EBVh0.4_Method7_MinData3_vpec150_ok/plots_HD/'
+# Metadata file with (t_Bmax, EBV_MW)
+
+MetadataFile2 = 'LowzSNe_metadata.txt'
+DirMetadata2 = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd/'
 
 # DirJband = '/Users/arturo/Dropbox/Research/Articulos/10_AndyKaisey/\
 # 10Compute/TheTemplates/AllBands/Plots/HubbleDiagram/GaussianProcess/'
 
-DistMu_np = np.genfromtxt(DirJband+
-                          'DistanceMu_All_BeforeCutoffs_.txt',
-                             dtype=['S30',
-       float,float,float,float,float,float,float,float,float,float,
-       float,float,float,float,float,float,float,float,float,float,
-       float,float,float,float,float,float,float,float,float,float,
-       float,float,float])
+DistMu_np = np.genfromtxt(DirMetadata2+ MetadataFile2,
+                             dtype=['S15', int, float,float,float,float])
 
 #----- Create a dictionary -----
 # (snname: TBmax, err_TBmax, EBV_MW, err_EBV_MW)
@@ -275,28 +174,25 @@ DistMu_dict ={}
 for i in range(len(DistMu_np)):
 
     # Sn name
-    # Create the variable "snName" containing the first 8 (or 7)
-    # letters of the SNe file name
-    snname_int_1 = DistMu_np['f0'][i]
-    try:
-        if   snname_int_1[7] == '_':
-            snName_1 = snname_int_1[:7]  # To read correctly, e.g., "sn2011B_"
-        elif snname_int_1[7] != '_':
-            # To read correctly, e.g., "snf20080514-002"
-            if is_number(snname_int_1[7]): snName_1 = snname_int_1[:15]
-            else: snName_1 = snname_int_1[:8]  # To read correctly, e.g., "sn1998bu"
-    except: snName_1 = snname_int_1[:6]  # To read correctly, e.g., "sn2011B"
+    snName_1 = DistMu_np['f0'][i]
 
-    TBmax_int     = DistMu_np['f14'][i]
-    err_TBmax_int = DistMu_np['f15'][i]
-    EBV_MW_int     = DistMu_np['f23'][i]
-    err_EBV_MW_int = DistMu_np['f24'][i]
+    TBmax_int_1 = DistMu_np['f2'][i]
+
+    # add 53000 MJD to tBmax of some CSP SNe.
+    if TBmax_int_1 < 4000:
+        TBmax_int = TBmax_int_1 + 53000
+    else: TBmax_int = TBmax_int_1
+
+    err_TBmax_int = DistMu_np['f3'][i]
+
+    EBV_MW_int     = DistMu_np['f4'][i]
+    err_EBV_MW_int = DistMu_np['f5'][i]
 
     DistMu_dict[snName_1] = [TBmax_int, err_TBmax_int, EBV_MW_int, err_EBV_MW_int]
 
 print '#', DistMu_dict['sn1998bu']
 
-# [50953.113988, 0.081145, 0.0217, 0.0002]
+# [50953.113989999998, 0.081140000000000004, 0.021700000000000001, 0.00020000000000000001]
 
 # #### Convert fluxes to zeropoint = 27.5 (default in SNANA)
 
@@ -311,12 +207,11 @@ print '# Test:', flux_snana(587.41, 25)
 
 # Test: 5874.1
 
+#-----------------------------------------------------------------------------80
+
 # # Read/convert Andy's wstd file to SNANA-format text file
 
 # Read the names of all the photometry files to be converted
-
-import glob # To read the files in my directory
-import os # To use command line like instructions
 
 os.chdir(dirwstd)
 
@@ -325,11 +220,13 @@ the_list = glob.glob('*.Wstd.dat')
 
 print '# %s SNe in this list'%len(the_list)
 
-the_list
+# the_list
 
 # #### Main loop
 
 zp_Andy = 25  # Andy's zeropoint: 25 mag
+
+count_lcs = 0 # count LCs converted to SNANA format
 
 # Loop over Andy's wstd LC files.
 for wstdFile in the_list:
@@ -351,6 +248,7 @@ for wstdFile in the_list:
     except: snName = wstdFile[:6]  # To read correctly, e.g., "sn2011B"
 
     #-------------------------------
+
 
     # Create a list of filters that are in a given photometric file:
 
@@ -420,11 +318,12 @@ for wstdFile in the_list:
     snana_file.write("# write_all_filters = %s. \n"%write_all_filters)
 
     snana_file.write(text_line_1)
-    snana_file.write('# Data table created by: Arturo Avelino \n')
+    snana_file.write('# Data table created by: %s\n'%code_created_by)
     if print_date_scriptName:
-        text_01 = now.strftime("%Y-%m-%d (yyyy-mm-dd); %H:%M hrs.")
+        text_01 = now.strftime("%Y.%m.%d (yyyy.mm.dd); %H:%M hrs.")
         snana_file.write('# On date: %s \n'%text_01)
-        snana_file.write('# Script used: %s \n'%NotebookName)
+        snana_file.write('# Script used: %s \n'%code_name)
+        snana_file.write('# Script version: %s \n'%version_code)
     snana_file.write(text_line_1)
 
     #---------------------
@@ -504,7 +403,11 @@ for wstdFile in the_list:
     snana_file.write('END:')
     snana_file.close();
 
+    count_lcs += 1
     print wstdFile[0:40]
 
-print '\n# All the conversion done smoothly'
+#--------------------------------------------------------60
+print '\n# All %s LCs converted smoothly'%count_lcs
+
+snana_file.close();snana_file.close();snana_file.close();
 
