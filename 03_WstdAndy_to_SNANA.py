@@ -15,8 +15,9 @@ import datetime # Get the current date and time
 code_created_by = 'Arturo_Avelino'
 # On date: 2017.01.10 (yyyy.mm.dd)
 code_name = '03_WstdAndy_to_SNANA.ipynb'
-version_code = '0.1.6'
-last_update = '2019.05.09'
+code_version = '0.1.7'
+code_last_update = '2019.05.10'
+code_location = 'https://github.com/ArturoAvelino/SALT2fit/blob/master/03_WstdAndy_to_SNANA.py'
 
 ##############################################################################80
 
@@ -24,7 +25,7 @@ last_update = '2019.05.09'
 
 # Directory where Andy's wstd files to be converted are located:
 
-dirwstd = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd/Others/selected/'
+dirwstd = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd2/Others/input_Wstd/'
 
 DirSaveOutput = dirwstd+'snana/'
 
@@ -32,7 +33,7 @@ DirSaveOutput = dirwstd+'snana/'
 # NOTE: For low-z CSP data set "Survey = 'CSP' ". This allows to fit the data in
 # SNANA/SALT2 with no issues.
 # Options:
-#      'LOWZ' for low-z CfA LCs.
+#      'LOWZ' for low-z CfA and Others LCs.
 #      'CSP' for low-z CSP LCs.
 Survey = 'LOWZ'
 
@@ -124,7 +125,7 @@ now = datetime.datetime.now()
 # ### Metadata
 
 MetadataFile = 'carrick_Flow_corrections_snnames_v1.txt'
-DirMetadata = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd/'
+DirMetadata = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd2/'
 
 # Reading the metadata file
 infoSNe_data = np.genfromtxt(DirMetadata+MetadataFile,
@@ -159,13 +160,10 @@ InfoSN_dict['sn1998bu']
 # Metadata file with (t_Bmax, EBV_MW)
 
 MetadataFile2 = 'LowzSNe_metadata.txt'
-DirMetadata2 = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd/'
-
-# DirJband = '/Users/arturo/Dropbox/Research/Articulos/10_AndyKaisey/\
-# 10Compute/TheTemplates/AllBands/Plots/HubbleDiagram/GaussianProcess/'
+DirMetadata2 = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd2/'
 
 DistMu_np = np.genfromtxt(DirMetadata2+ MetadataFile2,
-                             dtype=['S15', int, float,float,float,float])
+                             dtype=['S15',float,float,float,float])
 
 #----- Create a dictionary -----
 # (snname: TBmax, err_TBmax, EBV_MW, err_EBV_MW)
@@ -176,23 +174,21 @@ for i in range(len(DistMu_np)):
     # Sn name
     snName_1 = DistMu_np['f0'][i]
 
-    TBmax_int_1 = DistMu_np['f2'][i]
+    TBmax_int_1 = DistMu_np['f1'][i]
 
     # add 53000 MJD to tBmax of some CSP SNe.
     if TBmax_int_1 < 4000:
         TBmax_int = TBmax_int_1 + 53000
     else: TBmax_int = TBmax_int_1
 
-    err_TBmax_int = DistMu_np['f3'][i]
+    err_TBmax_int = DistMu_np['f2'][i]
 
-    EBV_MW_int     = DistMu_np['f4'][i]
-    err_EBV_MW_int = DistMu_np['f5'][i]
+    EBV_MW_int     = DistMu_np['f3'][i]
+    err_EBV_MW_int = DistMu_np['f4'][i]
 
     DistMu_dict[snName_1] = [TBmax_int, err_TBmax_int, EBV_MW_int, err_EBV_MW_int]
 
-print '#', DistMu_dict['sn1998bu']
-
-# [50953.113989999998, 0.081140000000000004, 0.021700000000000001, 0.00020000000000000001]
+# print '#', DistMu_dict['sn1998bu']
 
 # #### Convert fluxes to zeropoint = 27.5 (default in SNANA)
 
@@ -204,7 +200,6 @@ def flux_snana(flux_old, zp_Andy):
     return flux_new
 
 print '# Test:', flux_snana(587.41, 25)
-
 # Test: 5874.1
 
 #-----------------------------------------------------------------------------80
@@ -219,8 +214,6 @@ os.chdir(dirwstd)
 the_list = glob.glob('*.Wstd.dat')
 
 print '# %s SNe in this list'%len(the_list)
-
-# the_list
 
 # #### Main loop
 
@@ -248,8 +241,6 @@ for wstdFile in the_list:
     except: snName = wstdFile[:6]  # To read correctly, e.g., "sn2011B"
 
     #-------------------------------
-
-
     # Create a list of filters that are in a given photometric file:
 
     # Reset
@@ -320,10 +311,12 @@ for wstdFile in the_list:
     snana_file.write(text_line_1)
     snana_file.write('# Data table created by: %s\n'%code_created_by)
     if print_date_scriptName:
-        text_01 = now.strftime("%Y.%m.%d (yyyy.mm.dd); %H:%M hrs.")
+        text_01 = now.strftime("%Y.%m.%d (yyyy.mm.dd); %H:%M hrs (ET).")
         snana_file.write('# On date: %s \n'%text_01)
         snana_file.write('# Script used: %s \n'%code_name)
-        snana_file.write('# Script version: %s \n'%version_code)
+        snana_file.write('# Script version: %s \n'%code_version)
+        snana_file.write('# Script location:\n')
+        snana_file.write('# %s\n'%code_location)
     snana_file.write(text_line_1)
 
     #---------------------
