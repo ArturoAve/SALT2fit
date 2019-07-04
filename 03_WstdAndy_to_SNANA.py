@@ -3,7 +3,15 @@
 
 # # Code to convert from Andy's "wstd" LC files to SNANA format
 #
+# Python 2.7
+#
 # ## Notes
+#
+# - Input files:
+#     - Wstd files
+#     - metadata file with (snname, zhelio, e_zhel, zcmb, e_zcmb, sample, ra, dec)
+#     - metadata file with (snname, TBmax, err_TBmax, EBV_MW, err_EBV_MW)
+#
 # - The output files will be saved in a subfolder called 'snana'
 
 import numpy as np
@@ -11,12 +19,14 @@ import glob # To read the files in my directory
 import os # To use command line like instructions
 import datetime # Get the current date and time
 
+cc = 299792.458  # Speed of light (km/s)
+
 #--------------------------------------------------------60
 code_created_by = 'Arturo_Avelino'
 # On date: 2017.01.10 (yyyy.mm.dd)
 code_name = '03_WstdAndy_to_SNANA.ipynb'
-code_version = '0.1.7'
-code_last_update = '2019.05.10'
+code_version = '0.1.8'
+code_last_update = '2019.07.03'
 code_location = 'https://github.com/ArturoAvelino/SALT2fit/blob/master/03_WstdAndy_to_SNANA.py'
 
 ##############################################################################80
@@ -24,20 +34,32 @@ code_location = 'https://github.com/ArturoAvelino/SALT2fit/blob/master/03_WstdAn
 # # User
 
 # Directory where Andy's wstd files to be converted are located:
+dirwstd = '/Users/arturo/Documents/Research/Workplace/Wstd/'
 
-dirwstd = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd2/Others/input_Wstd/'
+# List of SNe filenames to be converted.
+file_listSNe = 'List_SNe_Notes_.txt'
 
-DirSaveOutput = dirwstd+'snana/'
+# Location of the list file:
+dirfilelist = '/Users/arturo/Documents/Research/Workplace/'
+
+#--------------------------------------------------------60
 
 # String to be printed in the 'SURVEY' line in SNANA files.
 # NOTE: For low-z CSP data set "Survey = 'CSP' ". This allows to fit the data in
-# SNANA/SALT2 with no issues.
+# SNANA/SALT2 with no issues when using the CSP kcorr file in SNANA.
 # Options:
 #      'LOWZ' for low-z CfA and Others LCs.
 #      'CSP' for low-z CSP LCs.
 Survey = 'LOWZ'
 
 #--------------------------------------------------------60
+
+# Directory to save the output:
+## DirSaveOutput = dirwstd+'snana/'
+DirSaveOutput = '/Users/arturo/Documents/Research/Workplace/snana/'
+
+# #### Filter's name matching between Andy and SNANA
+
 # Filter's name matching between Andy and SNANA
 
 # Write -all- the filter's name in the line "FILTERS: " in the
@@ -74,7 +96,6 @@ FilterNameConversion_dict['i_CSP'] = ['i']
 FilterNameConversion_dict['B_CSP'] = ['B']
 FilterNameConversion_dict['V_CSP'] = ['o']
 
-# To verify if the SNANA name is the correct one:
 FilterNameConversion_dict['B'] = ['B']
 FilterNameConversion_dict['V'] = ['V']
 FilterNameConversion_dict['R'] = ['R']
@@ -91,8 +112,6 @@ TrimFileName = -4
 # Print on the output files the date-time and script used to
 # create them?
 print_date_scriptName = True
-
-cc = 299792.458  # Speed of light (km/s)
 
 ##############################################################################80
 
@@ -115,17 +134,19 @@ def is_number(s):
         return False
 
 # Tests
-print is_number('5'), is_number('e')
+print '#', is_number('5'), is_number('e')
 # True False
 
 # Get the current date and time
 # Read the time and date now
 now = datetime.datetime.now()
 
-# ### Metadata
+# ## Input metadata
+
+# ### Read metadata (snname, zhelio, e_zhel, zcmb, e_zcmb, sample, ra, dec)
 
 MetadataFile = 'carrick_Flow_corrections_snnames_v1.txt'
-DirMetadata = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd2/'
+DirMetadata = '/Users/arturo/Documents/Research/Workplace/'
 
 # Reading the metadata file
 infoSNe_data = np.genfromtxt(DirMetadata+MetadataFile,
@@ -157,13 +178,13 @@ InfoSN_dict['sn1998bu']
 
 #-----------------------------------------------------------------------------80
 
-# Metadata file with (t_Bmax, EBV_MW)
+# ### Read metadata (t_Bmax, EBV_MW)
 
-MetadataFile2 = 'LowzSNe_metadata.txt'
-DirMetadata2 = '/Users/arturo/Downloads/tmp/Research/wstd_snana/Wstd2/'
+MetadataFile2 = 'tBmax_EBVMW_all.txt'
+DirMetadata2 = '/Users/arturo/Documents/Research/Workplace/'
 
 DistMu_np = np.genfromtxt(DirMetadata2+ MetadataFile2,
-                             dtype=['S15',float,float,float,float])
+                             dtype=['S16',float,float,float,float])
 
 #----- Create a dictionary -----
 # (snname: TBmax, err_TBmax, EBV_MW, err_EBV_MW)
@@ -208,14 +229,16 @@ print '# Test:', flux_snana(587.41, 25)
 
 # Read the names of all the photometry files to be converted
 
-os.chdir(dirwstd)
+the_list_np = np.genfromtxt(dirfilelist+file_listSNe, dtype=['S170'])
 
-#- Reading the LC data file names
-the_list = glob.glob('*.Wstd.dat')
+# Convert the numpy array to list:
+the_list = the_list_np['f0'].tolist()
 
-print '# %s SNe in this list'%len(the_list)
+print '# %s SNe in this list.'%len(the_list)
 
-# #### Main loop
+##############################################################################80
+
+# ### Main loop
 
 zp_Andy = 25  # Andy's zeropoint: 25 mag
 
@@ -304,8 +327,8 @@ for wstdFile in the_list:
     snana_file.write("# Andy Friedman's wstd file converted to SNANA-like format. \n")
     snana_file.write('# Source file: %s \n'%wstdFile)
     snana_file.write("# Metadata information from: %s \n"%MetadataFile)
-    snana_file.write("# Located at: \n")
-    snana_file.write("# %s \n"%DirMetadata)
+    # snana_file.write("# Located at: \n")
+    # snana_file.write("# %s \n"%DirMetadata)
     snana_file.write("# write_all_filters = %s. \n"%write_all_filters)
 
     snana_file.write(text_line_1)
@@ -315,7 +338,7 @@ for wstdFile in the_list:
         snana_file.write('# On date: %s \n'%text_01)
         snana_file.write('# Script used: %s \n'%code_name)
         snana_file.write('# Script version: %s \n'%code_version)
-        snana_file.write('# Script location:\n')
+        snana_file.write('# Script URL location:\n')
         snana_file.write('# %s\n'%code_location)
     snana_file.write(text_line_1)
 
